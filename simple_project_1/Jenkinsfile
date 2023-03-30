@@ -24,11 +24,6 @@ pipeline{
                 }
             }
         }
-        stage('Deploy Image') {
-            steps{
-                dockerImage.push
-            }
-        }
         stage('remove unused docker image') {
             steps{
                 //sh"docker rmi ${env.BUILD_NUMBER}"
