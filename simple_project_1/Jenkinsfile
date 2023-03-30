@@ -17,7 +17,7 @@ pipeline {
         stage('Build Docker') {
             steps {
                 script {
-                def dockerImage = docker.build("Docker")
+               def dockerImage = docker.build("Docker").withBuildArg("DOCKER_HOST", "tcp://43.205.228.100/:2375")
                 }
             }
         }
