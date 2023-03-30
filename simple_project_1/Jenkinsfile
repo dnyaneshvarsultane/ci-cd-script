@@ -1,36 +1,38 @@
-pipeline{
+pipeline {
     agent any
-    stages{
+    stages {
         stage('Git clone') {
             steps {
-                 // Get some code from a GitHub repository
                 git 'https://github.com/dnyaneshvarsultane/Hello-world.git'
             }
         }
         stage('Maven Build') {
-            steps{
-            sh 'mvn clean package -DskipTest=true'
-          }
+            steps {
+                sh 'mvn clean package -DskipTest=true'
+            }
         }
         stage('Build Docker') {
-            steps{
+            steps {
                 script {
-                    dockerImage = Docker.build("my-image:${env.BUILD_NUMBER}")
+                    def dockerImage = docker.build("my-image:${env.BUILD_NUMBER}")
                 }
             }
         }
-        stage('remove unused docker image') {
-            steps{
-                sh "docker rmi IMAGE_NAME:TAG"
+        stage('Remove Unused Docker Image') {
+            steps {
+                sh "docker rmi my-image:${env.BUILD_NUMBER}"
             }
         }
     }
-    post{
-        failure {
-            echo "Build is failed"
+    post {
+        always {
+            cleanWs()
         }
         success {
             echo "Build is successful"
+        }
+        failure {
+            echo "Build failed"
         }
     }
 }
