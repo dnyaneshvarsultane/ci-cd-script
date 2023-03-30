@@ -1,0 +1,47 @@
+pipeline{
+    environment{
+        servicename = 'sample_project_1'
+        gitCredential = 'dnyaneshvarsultane'
+        gitRepo = "https://github.com/dnyaneshvarsultane/Hello-world.git"
+        gitbranch = '${branch}'
+    }
+    agent any
+    stages{
+        stage('Git clone') {
+            steps {
+                git redentialsID: gitCredential, url: gitRepo, branch: gitbranch
+            }
+        }
+        stage('Maven Build') {
+            steps{
+            sh 'mvn clean package -DskipTest=true'
+          }
+        }
+        stage('Build Docker') {
+            steps{
+                script {
+                    dockerImage = docker.build(registry)
+                }
+            }
+        }
+        stage('Deploy Image') {
+            steps{
+                dockerImage.push("latest")
+            }
+        }
+        stage('remove unused docker image') {
+            steps{
+                //sh"docker rmi ${env.BUILD_NUMBER}"
+                sh "docker rmi:latest"
+            }
+        }
+    }
+    post{
+        failure {
+            echo "Build is failed"
+        }
+        success {
+            echo "Build is successful"
+        }
+    }
+}
