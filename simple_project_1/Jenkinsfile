@@ -15,14 +15,13 @@ pipeline{
         stage('Build Docker') {
             steps{
                 script {
-                    dockerImage = docker.build
+                    def dockerImage = docker.build('REGISTRY_NAME:TAG')
                 }
             }
         }
         stage('remove unused docker image') {
             steps{
-                //sh"docker rmi ${env.BUILD_NUMBER}"
-                sh "docker rmi:latest"
+                sh "docker rmi IMAGE_NAME:TAG"
             }
         }
     }
