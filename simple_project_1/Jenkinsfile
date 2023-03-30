@@ -17,7 +17,7 @@ pipeline {
         stage('Build Docker') {
             steps {
                 script {
-                def dockerImage = docker.build("<Dockerfile-directory>").withBuildArg("DOCKER_HOST", "tcp://43.205.228.100/:2375").withRun("-v /var/run/docker.sock:/var/run/docker.sock").tag("my-image:${env.BUILD_NUMBER}")
+                def dockerImage = docker.build("Docker")
                 }
             }
         }
