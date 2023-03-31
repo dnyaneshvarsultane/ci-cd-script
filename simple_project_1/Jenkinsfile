@@ -6,21 +6,20 @@ pipeline {
     stages {
         stage('Git clone') {
             steps {
-                git 'https://github.com/dnyaneshvarsultane/Hello-world.git'
+                 git 'https://github.com/dnyaneshvarsultane/Hello-world.git'
             }
         }
         stage('Maven Build') {
             steps {
-                sh 'mvn clean package -DskipTests=true'
+                sh 'mvn clean package -DskipTests'
             }
         }
         stage('Build Docker') {
             steps {
                 script {
-                    docker.build("my-image:${env.BUILD_NUMBER}")
-                        .withBuildArg("DOCKER_HOST", "${DOCKER_HOST}")
-                        .withRun("-v /var/run/docker.sock:/var/run/docker.sock")
-                        .push()
+                    def dockerImage = docker.build("my-image:${env.BUILD_NUMBER}", "--build-arg DOCKER_HOST=${env.DOCKER_HOST} .").inside("--privileged -v /var/run/docker.sock:/var/run/docker.sock") {
+                        sh 'ls -la'
+                    }
                 }
             }
         }
