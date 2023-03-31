@@ -1,8 +1,8 @@
 pipeline {
-    environment {
-    DOCKER_HOST = 'tcp://43.205.228.100/:2375'
-}
     agent any
+    environment {
+        DOCKER_HOST = 'tcp://65.1.114.8:2375'
+    }
     stages {
         stage('Git clone') {
             steps {
@@ -11,13 +11,16 @@ pipeline {
         }
         stage('Maven Build') {
             steps {
-                sh 'mvn clean package -DskipTest=true'
+                sh 'mvn clean package -DskipTests=true'
             }
         }
         stage('Build Docker') {
             steps {
                 script {
-              def dockerImage = docker.build("Docker").withBuildArg("DOCKER_HOST", "tcp://43.205.228.100/:2375").withRun("-v /var/run/docker.sock:/var/run/docker.sock").tag("my-image:${env.BUILD_NUMBER}")
+                    docker.build("my-image:${env.BUILD_NUMBER}")
+                        .withBuildArg("DOCKER_HOST", "${DOCKER_HOST}")
+                        .withRun("-v /var/run/docker.sock:/var/run/docker.sock")
+                        .push()
                 }
             }
         }
