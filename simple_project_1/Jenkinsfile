@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        DOCKER_HOST = 'tcp://15.206.167.109'
+        DOCKER_HOST = 'tcp://15.206.116.106'
     }
     stages {
         stage('Git clone') {
