@@ -17,7 +17,7 @@ pipeline {
         stage('Build Docker') {
             steps {
                 script {
-                  def dockerImage = docker.build("docker_jar:latest")
+                    def app = docker.build("myapp:${env.BUILD_NUMBER}")
                 }
             }
         }
