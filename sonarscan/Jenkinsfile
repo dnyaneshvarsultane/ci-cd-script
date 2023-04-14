@@ -1,0 +1,24 @@
+pipeline{
+  agent any 
+  stages{
+    stage('git checkout'){
+      steps{
+        git credentialsId: 'github-credential', url: 'https://github.com/dnyaneshvarsultane/springboot-maven-micro.git'
+      }
+    }
+    stage('build the package'){
+      steps{
+        sh 'mvn clean package'
+      }
+    }
+    stage('sonar quality check'){
+      steps{
+        script{
+         withSonarQubeEnv(installationName: 'soanr-container', credentialsId: 'devops-jenkins') {
+          sh 'mvn sonar:sonar'
+         }
+        }
+      }
+    }
+  }
+}
