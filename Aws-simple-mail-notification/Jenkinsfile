@@ -1,0 +1,45 @@
+pipeline{
+  agent any 
+  environment{
+    registry = '078187675174.dkr.ecr.ap-south-1.amazonaws.com/devops'
+    registryCredential = 'jenkins-aws-ecr-login'
+    dockerImage = ''
+  }
+  stages{
+    stage('git checkout'){
+      steps{
+        git credentialsId: 'github-credential', url: 'https://github.com/dnyaneshvarsultane/springboot-maven-micro.git'
+      }
+    }
+    stage('build the package'){
+      steps{
+        sh 'mvn clean package'
+      }
+    }
+    stage('Build docker image') {
+      steps{
+        script {
+          dockerImage = docker.build registry + ":$BUILD_NUMBER"
+        }
+      }
+    }
+    stage('docker deploy image on Amazon Ecr') {
+      steps{
+        script{
+          docker.withRegistry("http://" +registry, "ecr:ap-south-1:" + registryCredential ) {
+            dockerImage.push()
+          }
+        }
+      }
+    }
+  } // Add this closing curly brace to close the "stages" block
+ post {
+  success {
+    mail bcc: '', body: 'pipeline build successfully', cc: '', from: 'dnyaneshvarssultane@gmail.com', replyTo: '', subject: 'The pipeline success', to: 'dnyaneshvarssultane@gmail.com'
+  }
+  failure {
+    mail bcc: '', body: 'pipeline build not success', cc: '', from: 'dnyaneshvarssultane@gmail.com', replyTo: '', subject: 'The pipeline failed', to: 'dnyaneshvarssultane@gmail.com'
+  }	
+}
+
+  }	
